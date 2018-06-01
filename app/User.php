@@ -15,7 +15,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'facebook_id'
     ];
 
     /**
@@ -26,4 +26,16 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function addNew($input)
+    {
+        // Este proceso es para verificar si el Id cliente del usuario ya existe, si existe no crea el registro, se evita la duplicidad
+        $check = static::where('facebook_id', $input['facebook_id'])->first();
+
+        if(is_null($check)){
+            return static::create($input);
+        }
+
+        return $check;
+    }
 }
