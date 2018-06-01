@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Socialite; 
+// agregado por thavoo
+use Exception;
+use Auth;
 
 class SocialController extends Controller
 {
@@ -16,16 +19,25 @@ class SocialController extends Controller
 
     }
 
-    public function callback(){
+    public function callback()
+    {
+        try {
+            $user = Socialite::driver('facebook')->user();
+            $create['name'] = $user->getName();
+            $create['email'] = $user->getEmail();
+            $create['facebook_id'] = $user->getId();
 
-    	//return 'prueba';
+            $userModel = new User;
+            $createdUser = $userModel->addNew($create);
+            Auth::loginUsingId($createdUser->id);
+            
+            return redirect()->route('home');
+        } catch(Exception $e) {
+            return redirect('/redirect');
+        }
+    	
 
-
-    	$user = Socialite::driver('facebook')->user();
-
-    	//dd($user);
-
-    	return ($user->getAvatar());
+    	
     }
 
 
